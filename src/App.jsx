@@ -1,15 +1,24 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 function App() {
+    console.log("App Component: Initializing...");
     // Core State
     const [isConnected, setIsConnected] = useState(false);
     const [device, setDevice] = useState(null);
     const [txCharacteristic, setTxCharacteristic] = useState(null);
     const [commands, setCommands] = useState(() => {
-        return JSON.parse(localStorage.getItem('nexus_commands')) || {
-            'pad-up': 'up', 'pad-down': 'down', 'pad-left': 'left', 'pad-right': 'right',
-            'btn-a': 'horn', 'btn-b': 'b'
-        };
+        try {
+            const saved = localStorage.getItem('nexus_commands');
+            return saved ? JSON.parse(saved) : {
+                'pad-up': 'up', 'pad-down': 'down', 'pad-left': 'left', 'pad-right': 'right',
+                'btn-a': 'horn', 'btn-b': 'b'
+            };
+        } catch (e) {
+            return {
+                'pad-up': 'up', 'pad-down': 'down', 'pad-left': 'left', 'pad-right': 'right',
+                'btn-a': 'horn', 'btn-b': 'b'
+            };
+        }
     });
 
     // UI State
@@ -32,7 +41,12 @@ function App() {
     const [recording, setRecording] = useState(false);
     const [recordedSequence, setRecordedSequence] = useState([]);
     const [savedSequences, setSavedSequences] = useState(() => {
-        return JSON.parse(localStorage.getItem('nexus_sequences')) || [];
+        try {
+            const saved = localStorage.getItem('nexus_sequences');
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            return [];
+        }
     });
 
     // Joystick State
@@ -149,28 +163,32 @@ basic.showIcon(IconNames.Happy)`;
 
     // ===== VOICE CONTROL =====
     useEffect(() => {
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
+        try {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
 
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
 
-        recognition.onresult = (event) => {
-            const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
-            setLastVoiceCommand(transcript);
+            recognition.onresult = (event) => {
+                const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+                setLastVoiceCommand(transcript);
 
-            if (transcript.includes('forward') || transcript.includes('go')) sendCmd(commands['pad-up']);
-            else if (transcript.includes('back') || transcript.includes('reverse')) sendCmd(commands['pad-down']);
-            else if (transcript.includes('left')) sendCmd(commands['pad-left']);
-            else if (transcript.includes('right')) sendCmd(commands['pad-right']);
-            else if (transcript.includes('stop') || transcript.includes('halt')) sendCmd('stop');
-            else if (transcript.includes('horn') || transcript.includes('beep')) sendCmd(commands['btn-a']);
-        };
+                if (transcript.includes('forward') || transcript.includes('go')) sendCmd(commands['pad-up']);
+                else if (transcript.includes('back') || transcript.includes('reverse')) sendCmd(commands['pad-down']);
+                else if (transcript.includes('left')) sendCmd(commands['pad-left']);
+                else if (transcript.includes('right')) sendCmd(commands['pad-right']);
+                else if (transcript.includes('stop') || transcript.includes('halt')) sendCmd('stop');
+                else if (transcript.includes('horn') || transcript.includes('beep')) sendCmd(commands['btn-a']);
+            };
 
-        recognitionRef.current = recognition;
-    }, [sendCmd]);
+            recognitionRef.current = recognition;
+        } catch (e) {
+            console.error("Speech Recognition Error:", e);
+        }
+    }, [sendCmd, commands]);
 
     const toggleVoice = () => {
         if (!recognitionRef.current) {
