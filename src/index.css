@@ -29,85 +29,15 @@ body {
 
 .app-container {
     max-width: 1400px;
-    margin: 0 auto;
+    margin: 80px auto 0 auto;
+    /* Added margin-top for fixed navbar */
     padding: 2rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
 }
 
-/* Header - Apple Style Precision */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.2rem 2rem;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: saturate(180%) blur(20px);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    box-shadow: var(--shadow-soft);
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-}
-
-.brand-icon {
-    font-size: 1.8rem;
-}
-
-.brand h1 {
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-}
-
-.brand h1 span {
-    color: var(--accent-blue);
-}
-
-.nav-actions {
-    display: flex;
-    gap: 1rem;
-}
-
-.btn-connect {
-    background-color: var(--accent-blue);
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: var(--transition-fast);
-}
-
-.btn-connect:hover {
-    background-color: #0077ed;
-    transform: scale(1.02);
-}
-
-.btn-connect.online {
-    background-color: var(--accent-green);
-}
-
-.icon-setting {
-    background: #f5f5f7;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: var(--transition-fast);
-}
-
-.icon-setting:hover {
-    background: #e8e8ed;
-}
+/* Legacy Header styles removed - now using Navbar component */
 
 /* Dashboard - Clear Hierarchy */
 .dashboard {
