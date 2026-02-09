@@ -1,4 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import VoiceMode from './components/VoiceMode.jsx';
+import GestureMode from './components/GestureMode.jsx';
+import JoystickMode from './components/JoystickMode.jsx';
+import RecordMode from './components/RecordMode.jsx';
+import MissionPlanner from './components/MissionPlanner.jsx';
+import MakeCodePanel from './components/MakeCodePanel.jsx';
 
 function App() {
     // Core State
@@ -598,335 +604,55 @@ basic.showIcon(IconNames.Happy)`;
                         </div>
                     )}
 
-                    {/* VOICE MODE */}
-                    {activeMode === 'voice' && (
-                        <div style={{ padding: '3rem', textAlign: 'center' }}>
-                            <div style={{ fontSize: '5rem', marginBottom: '2rem' }}>🎙️</div>
-                            <h2 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Voice Command Center</h2>
-                            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-                                Say: "Forward", "Back", "Left", "Right", "Stop", "Horn"
-                            </p>
+                    <VoiceMode
+                        active={activeMode === 'voice'}
+                        voiceActive={voiceActive}
+                        lastVoiceCommand={lastVoiceCommand}
+                        toggleVoice={toggleVoice}
+                    />
 
-                            <button
-                                onClick={toggleVoice}
-                                style={{
-                                    padding: '1.5rem 3rem',
-                                    fontSize: '1.2rem',
-                                    background: voiceActive ? 'var(--accent-red)' : 'var(--accent-blue)',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '16px',
-                                    cursor: 'pointer',
-                                    marginBottom: '2rem'
-                                }}
-                            >
-                                {voiceActive ? '🛑 Stop Listening' : '🎤 Start Voice Control'}
-                            </button>
+                    <GestureMode
+                        active={activeMode === 'gesture'}
+                        gestureActive={gestureActive}
+                        setGestureActive={setGestureActive}
+                        tiltData={tiltData}
+                    />
 
-                            {voiceActive && (
-                                <div style={{
-                                    padding: '1.5rem',
-                                    background: '#f8f9fa',
-                                    borderRadius: '12px',
-                                    display: 'inline-block',
-                                    animation: 'pulse 1.5s infinite'
-                                }}>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Listening...</div>
-                                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--accent-blue)' }}>
-                                        {lastVoiceCommand || 'Speak now'}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    <JoystickMode
+                        active={activeMode === 'joystick'}
+                        joystickRef={joystickRef}
+                        joystickDragging={joystickDragging}
+                        joystickPos={joystickPos}
+                        handleJoystickMove={handleJoystickMove}
+                        handleJoystickEnd={handleJoystickEnd}
+                    />
 
-                    {/* GESTURE MODE */}
-                    {activeMode === 'gesture' && (
-                        <div style={{ padding: '3rem', textAlign: 'center' }}>
-                            <div style={{ fontSize: '5rem', marginBottom: '2rem' }}>📱</div>
-                            <h2 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Gesture Control</h2>
-                            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-                                Tilt your device to steer the robot
-                            </p>
+                    <RecordMode
+                        active={activeMode === 'record'}
+                        recording={recording}
+                        recordedSequence={recordedSequence}
+                        savedSequences={savedSequences}
+                        startRecording={startRecording}
+                        stopRecording={stopRecording}
+                        playSequence={playSequence}
+                    />
 
-                            <button
-                                onClick={() => setGestureActive(!gestureActive)}
-                                style={{
-                                    padding: '1.5rem 3rem',
-                                    fontSize: '1.2rem',
-                                    background: gestureActive ? 'var(--accent-red)' : 'var(--accent-blue)',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '16px',
-                                    cursor: 'pointer',
-                                    marginBottom: '2rem'
-                                }}
-                            >
-                                {gestureActive ? '🛑 Stop Gesture' : '🚀 Activate Tilt Control'}
-                            </button>
+                    <MissionPlanner
+                        active={activeMode === 'mission'}
+                        missionPath={missionPath}
+                        executingMission={executingMission}
+                        addMissionPoint={addMissionPoint}
+                        executeMission={executeMission}
+                        clearMission={() => setMissionPath([])}
+                    />
 
-                            {gestureActive && (
-                                <div style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: '1fr 1fr',
-                                    gap: '1rem',
-                                    maxWidth: '400px',
-                                    margin: '0 auto'
-                                }}>
-                                    <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '12px' }}>
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Forward/Back</div>
-                                        <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--accent-blue)' }}>{tiltData.beta.toFixed(0)}°</div>
-                                    </div>
-                                    <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '12px' }}>
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Left/Right</div>
-                                        <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--accent-purple)' }}>{tiltData.gamma.toFixed(0)}°</div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {/* JOYSTICK MODE */}
-                    {activeMode === 'joystick' && (
-                        <div style={{ padding: '3rem', textAlign: 'center' }}>
-                            <h2 style={{ marginBottom: '2rem', color: 'var(--text-primary)' }}>Virtual Joystick</h2>
-
-                            <div
-                                ref={joystickRef}
-                                style={{
-                                    width: '300px',
-                                    height: '300px',
-                                    borderRadius: '50%',
-                                    background: '#f8f9fa',
-                                    margin: '0 auto',
-                                    position: 'relative',
-                                    border: '2px solid var(--border-color)',
-                                    cursor: 'grab'
-                                }}
-                                onMouseDown={(e) => {
-                                    joystickDragging.current = true;
-                                    handleJoystickMove(e.clientX, e.clientY);
-                                }}
-                                onMouseMove={(e) => {
-                                    if (joystickDragging.current) handleJoystickMove(e.clientX, e.clientY);
-                                }}
-                                onMouseUp={handleJoystickEnd}
-                                onMouseLeave={handleJoystickEnd}
-                                onTouchStart={(e) => {
-                                    joystickDragging.current = true;
-                                    const touch = e.touches[0];
-                                    handleJoystickMove(touch.clientX, touch.clientY);
-                                }}
-                                onTouchMove={(e) => {
-                                    if (joystickDragging.current) {
-                                        const touch = e.touches[0];
-                                        handleJoystickMove(touch.clientX, touch.clientY);
-                                    }
-                                }}
-                                onTouchEnd={handleJoystickEnd}
-                            >
-                                <div style={{
-                                    position: 'absolute',
-                                    width: '80px',
-                                    height: '80px',
-                                    borderRadius: '50%',
-                                    background: 'var(--accent-blue)',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: `translate(calc(-50% + ${joystickPos.x}px), calc(-50% + ${joystickPos.y}px))`,
-                                    transition: joystickDragging.current ? 'none' : 'transform 0.2s ease',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                                }} />
-                            </div>
-                        </div>
-                    )}
-
-                    {/* RECORD MODE */}
-                    {activeMode === 'record' && (
-                        <div style={{ padding: '2rem' }}>
-                            <h2 style={{ marginBottom: '2rem', color: 'var(--text-primary)' }}>Record & Replay</h2>
-
-                            <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                                <button
-                                    onClick={recording ? stopRecording : startRecording}
-                                    style={{
-                                        padding: '1rem 2rem',
-                                        fontSize: '1rem',
-                                        background: recording ? 'var(--accent-red)' : 'var(--accent-blue)',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '12px',
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    {recording ? '⏹️ Stop Recording' : '⏺️ Start Recording'}
-                                </button>
-                                {recording && (
-                                    <div style={{ marginTop: '1rem', color: 'var(--accent-red)', fontWeight: '700' }}>
-                                        Recording... ({recordedSequence.length} commands)
-                                    </div>
-                                )}
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
-                                {savedSequences.map((seq, idx) => (
-                                    <div key={idx} style={{
-                                        padding: '1.5rem',
-                                        background: '#f8f9fa',
-                                        borderRadius: '12px',
-                                        border: '1px solid var(--border-color)'
-                                    }}>
-                                        <div style={{ fontWeight: '700', marginBottom: '0.5rem' }}>{seq.name}</div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                                            {seq.sequence.length} steps
-                                        </div>
-                                        <button
-                                            onClick={() => playSequence(seq.sequence)}
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.5rem',
-                                                background: 'var(--accent-blue)',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '8px',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            ▶️ Play
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* MISSION MODE */}
-                    {activeMode === 'mission' && (
-                        <div style={{ padding: '2rem' }}>
-                            <h2 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Mission Planner</h2>
-                            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Click on the grid to plan a path</p>
-
-                            <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                                <button
-                                    onClick={executeMission}
-                                    disabled={missionPath.length < 2 || executingMission}
-                                    style={{
-                                        padding: '1rem 2rem',
-                                        background: 'var(--accent-blue)',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '12px',
-                                        cursor: 'pointer',
-                                        marginRight: '1rem',
-                                        opacity: missionPath.length < 2 ? 0.5 : 1
-                                    }}
-                                >
-                                    🚀 Execute Mission
-                                </button>
-                                <button
-                                    onClick={() => setMissionPath([])}
-                                    style={{
-                                        padding: '1rem 2rem',
-                                        background: '#f8f9fa',
-                                        color: 'var(--text-primary)',
-                                        border: '1px solid var(--border-color)',
-                                        borderRadius: '12px',
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    🗑️ Clear
-                                </button>
-                            </div>
-
-                            <svg
-                                width="600"
-                                height="400"
-                                style={{
-                                    background: '#f8f9fa',
-                                    borderRadius: '12px',
-                                    border: '1px solid var(--border-color)',
-                                    cursor: 'crosshair',
-                                    display: 'block',
-                                    margin: '0 auto'
-                                }}
-                                onClick={(e) => {
-                                    const rect = e.currentTarget.getBoundingClientRect();
-                                    const x = e.clientX - rect.left;
-                                    const y = e.clientY - rect.top;
-                                    addMissionPoint(x, y);
-                                }}
-                            >
-                                {/* Grid */}
-                                {[...Array(12)].map((_, i) => (
-                                    <line key={`v${i}`} x1={i * 50} y1="0" x2={i * 50} y2="400" stroke="#ddd" strokeWidth="1" />
-                                ))}
-                                {[...Array(8)].map((_, i) => (
-                                    <line key={`h${i}`} x1="0" y1={i * 50} x2="600" y2={i * 50} stroke="#ddd" strokeWidth="1" />
-                                ))}
-
-                                {/* Path */}
-                                {missionPath.map((point, idx) => (
-                                    <g key={idx}>
-                                        <circle cx={point.x} cy={point.y} r="8" fill="var(--accent-blue)" />
-                                        {idx > 0 && (
-                                            <line
-                                                x1={missionPath[idx - 1].x}
-                                                y1={missionPath[idx - 1].y}
-                                                x2={point.x}
-                                                y2={point.y}
-                                                stroke="var(--accent-blue)"
-                                                strokeWidth="3"
-                                                markerEnd="url(#arrowhead)"
-                                            />
-                                        )}
-                                    </g>
-                                ))}
-
-                                <defs>
-                                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                                        <polygon points="0 0, 10 3, 0 6" fill="var(--accent-blue)" />
-                                    </marker>
-                                </defs>
-                            </svg>
-                        </div>
-                    )}
-
-                    {/* MakeCode Editor - Always Visible */}
-                    <div className="col-bottom">
-                        <section className="panel editor-panel">
-                            <div className="editor-toolbar">
-                                <div className="editor-title-group">
-                                    <span className="editor-subtitle">Logic Configuration</span>
-                                    <div className="editor-info"><strong>MakeCode Workspace</strong></div>
-                                </div>
-                                <div className="toolbar-btns">
-                                    <button onClick={() => setShowCodePreview(!showCodePreview)} className="btn-outline">
-                                        {showCodePreview ? 'Hide' : 'Preview'}
-                                    </button>
-                                    <button onClick={directSync} className="btn-connect" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>Sync</button>
-                                    <button onClick={downloadCode} className="copy-badge" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid #d2d2d7', color: 'var(--text-primary)' }}>📥 Save</button>
-                                </div>
-                            </div>
-
-                            <div className="editor-workspace" style={{ height: '800px' }}>
-                                {showCodePreview && (
-                                    <div className="code-preview">
-                                        <div className="preview-header">Current Script:</div>
-                                        <pre><code>{firmwareCode}</code></pre>
-                                    </div>
-                                )}
-                                <div className="iframe-box">
-                                    <iframe
-                                        id="makecode-frame"
-                                        src="https://makecode.microbit.org/#pub:_RsCVsEF3M0Hg"
-                                        allow="usb; bluetooth"
-                                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-popups-to-escape-sandbox"
-                                        style={{ width: '100%', height: '100%', border: 'none' }}
-                                    ></iframe>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
+                    <MakeCodePanel
+                        showCodePreview={showCodePreview}
+                        setShowCodePreview={setShowCodePreview}
+                        firmwareCode={firmwareCode}
+                        directSync={directSync}
+                        downloadCode={downloadCode}
+                    />
                 </main>
 
                 {showSidebar && (
