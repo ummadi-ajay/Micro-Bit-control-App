@@ -301,7 +301,7 @@ const Navbar = ({ isConnected, connect, disconnect, onShowSidebar }) => {
             <nav className={`navbar navbar-expand-lg navbar-ultra ${isFloating ? 'floating' : ''}`} id="mainNav">
                 <div className="container-fluid px-lg-5">
                     <a className="navbar-brand" href="/">
-                        <span>MAKERWORKS</span>
+                        <span>MAKERWORKS - NEW</span>
                     </a>
 
                     <div className="d-flex align-items-center gap-3 order-lg-3">
