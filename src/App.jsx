@@ -59,10 +59,15 @@ function App() {
     const joystickRef = useRef(null);
     const joystickDragging = useRef(false);
 
-    // Telemetry State
+    // Telemetry State (reserved for future use)
     const [telemetry, setTelemetry] = useState({
         battery: 100, distance: 0, speed: 0, temperature: 22, light: 50
     });
+
+    // Safety Settings
+    const [autoStopSeconds, setAutoStopSeconds] = useState(3);
+    const lastInputRef = useRef(Date.now());
+    const autoStoppedRef = useRef(false);
 
     // Mission Planner State
     const [missionPath, setMissionPath] = useState([]);
@@ -85,7 +90,7 @@ function App() {
         localStorage.setItem('nexus_sequences', JSON.stringify(savedSequences));
     }, [savedSequences]);
 
-    // Generate Firmware
+    // Generate Firmware (includes auto-brake on disconnect)
     useEffect(() => {
         const code = `/**
  * Nexus Robot Control Firmware
@@ -98,6 +103,9 @@ bluetooth.onBluetoothConnected(function () {
 })
 bluetooth.onBluetoothDisconnected(function () {
     basic.showIcon(IconNames.Asleep)
+    // Auto-brake when Bluetooth is lost
+    pins.servoWritePin(AnalogPin.P0, 90)
+    pins.servoWritePin(AnalogPin.P1, 90)
 })
 bluetooth.onUartDataReceived(serial.delimiters(Delimiters.NewLine), function () {
     receivedString = bluetooth.uartReadUntil(serial.delimiters(Delimiters.NewLine))
@@ -138,6 +146,12 @@ basic.showIcon(IconNames.Happy)`;
         if (!device || !device.gatt.connected) return;
 
         try {
+            // Track user activity for safety timeout (ignore auto "stop")
+            if (msg !== 'stop') {
+                lastInputRef.current = Date.now();
+                autoStoppedRef.current = false;
+            }
+
             // Re-acquire characteristic if lost but connected
             let char = txCharacteristic;
             if (!char) {
@@ -165,6 +179,27 @@ basic.showIcon(IconNames.Happy)`;
             setCommandLog(prev => [{ time: 'Error', msg: 'Delivery Failed' }, ...prev].slice(0, 5));
         }
     }, [device, txCharacteristic, recording]);
+
+    // Global safety timeout: auto-stop if no input for X seconds
+    useEffect(() => {
+        if (!isConnected) return;
+
+        const id = setInterval(() => {
+            if (!isConnected) return;
+            if (autoStoppedRef.current) return;
+
+            const diff = Date.now() - lastInputRef.current;
+            if (diff > autoStopSeconds * 1000) {
+                // Auto-brake
+                sendCmd('stop');
+                autoStoppedRef.current = true;
+                setActiveButton(null);
+                setJoystickPos({ x: 0, y: 0 });
+            }
+        }, 500);
+
+        return () => clearInterval(id);
+    }, [isConnected, autoStopSeconds, sendCmd]);
 
     // ===== VOICE CONTROL =====
     useEffect(() => {
@@ -659,8 +694,14 @@ basic.showIcon(IconNames.Happy)`;
                     <aside className="sidebar show">
                         <div className="sidebar-header">
                             <h2>Settings</h2>
-                            <button onClick={() => setShowSidebar(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+                            <button
+                                onClick={() => setShowSidebar(false)}
+                                style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}
+                            >
+                                &times;
+                            </button>
                         </div>
+
                         <div className="config-list" style={{ marginTop: '2rem' }}>
                             {Object.keys(commands).map(key => (
                                 <div key={key} className="config-row">
@@ -671,6 +712,26 @@ basic.showIcon(IconNames.Happy)`;
                                     />
                                 </div>
                             ))}
+                        </div>
+
+                        <div style={{ marginTop: '2rem' }}>
+                            <h3 style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>Safety</h3>
+                            <div className="config-row">
+                                <label>Auto-stop (seconds)</label>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1 }}>
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="8"
+                                        value={autoStopSeconds}
+                                        onChange={(e) => setAutoStopSeconds(Number(e.target.value))}
+                                        style={{ flex: 1 }}
+                                    />
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                        {autoStopSeconds}s
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </aside>
                 )}
