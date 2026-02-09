@@ -493,6 +493,50 @@ basic.showIcon(IconNames.Happy)`;
     return (
         <>
             <div className="app-container">
+                {/* Header Actions */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ fontSize: '1.5rem' }}>🤖</div>
+                        <div style={{ fontWeight: '800', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Nexus<span style={{ color: 'var(--accent-blue)' }}>Control</span></div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button
+                            onClick={isConnected ? disconnect : connect}
+                            style={{
+                                padding: '0.6rem 1.2rem',
+                                borderRadius: '50px',
+                                background: isConnected ? 'var(--accent-green)' : 'var(--accent-blue)',
+                                color: 'white',
+                                border: 'none',
+                                fontWeight: '700',
+                                fontSize: '0.85rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}
+                        >
+                            <i className={`bi ${isConnected ? 'bi-bluetooth' : 'bi-cpu-fill'}`}></i>
+                            {isConnected ? 'Connected' : 'Connect Device'}
+                        </button>
+                        <button
+                            onClick={() => setShowSidebar(true)}
+                            style={{
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '50%',
+                                border: '1px solid var(--border-color)',
+                                background: 'white',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <i className="bi bi-gear-fill"></i>
+                        </button>
+                    </div>
+                </div>
 
                 {/* Micro:bit Setup Guide */}
                 <section className="panel" style={{ background: 'linear-gradient(135deg, #fff 0%, #f0f7ff 100%)', border: '1px solid #cce4ff' }}>
