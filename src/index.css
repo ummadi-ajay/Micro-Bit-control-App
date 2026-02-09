@@ -29,9 +29,12 @@ body {
 
 .app-container {
     max-width: 1400px;
-    margin: 80px auto 0 auto;
-    /* Added margin-top for fixed navbar */
-    padding: 2rem;
+    margin: 100px auto 40px auto;
+    /* Increased margin-top and added bottom margin */
+    padding: 1rem 2rem;
+    /* Reduced vertical padding slightly */
+    min-height: calc(100vh - 400px);
+    /* Ensure footer stays down even on short pages */
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -408,7 +411,8 @@ iframe {
     height: 100%;
     background: white;
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
-    z-index: 100;
+    z-index: 3000;
+    /* Higher than navbar (2000) to avoid collision */
     padding: 3rem 2rem;
     transform: translateX(100%);
     transition: transform 0.3s ease;

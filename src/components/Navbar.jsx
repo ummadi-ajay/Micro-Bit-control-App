@@ -117,6 +117,7 @@ const Navbar = ({ isConnected, connect, disconnect, onShowSidebar }) => {
                     transform: rotate(30deg);
                 }
 
+
                 @media (max-width: 600px) {
                     .navbar-nexus {
                         padding: 0.8rem 1.2rem;

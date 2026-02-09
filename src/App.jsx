@@ -463,7 +463,7 @@ basic.showIcon(IconNames.Happy)`;
             <div className="app-container">
 
                 {/* Micro:bit Setup Guide */}
-                <section className="panel" style={{ margin: '0 2rem', background: 'linear-gradient(135deg, #fff 0%, #f0f7ff 100%)', border: '1px solid #cce4ff' }}>
+                <section className="panel" style={{ background: 'linear-gradient(135deg, #fff 0%, #f0f7ff 100%)', border: '1px solid #cce4ff' }}>
                     <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
                         <div style={{ flex: 1 }}>
                             <h3 style={{ color: 'var(--accent-blue)', marginBottom: '1rem', fontSize: '0.9rem' }}>🚀 2-STEP MICRO:BIT SYNC</h3>
@@ -485,7 +485,7 @@ basic.showIcon(IconNames.Happy)`;
                 </section>
 
                 {/* Live Connection & Log */}
-                <section className="panel" style={{ margin: '0 2rem', padding: '1rem', background: '#1d1d1f', color: '#00ff41', fontFamily: 'monospace', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
+                <section className="panel" style={{ padding: '1rem', background: '#1d1d1f', color: '#00ff41', fontFamily: 'monospace', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', borderBottom: '1px solid #333', paddingBottom: '0.5rem' }}>
                         <span style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>📡 LIVE TRANSMISSION LOG</span>
                         <span style={{ fontSize: '0.6rem', color: isConnected ? '#00ff41' : '#ff3b30' }}>{isConnected ? '• CONNECTED' : '• OFFLINE'}</span>
