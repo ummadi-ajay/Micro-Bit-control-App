@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 
 function App() {
-    console.log("App Component: Initializing...");
     // Core State
     const [isConnected, setIsConnected] = useState(false);
     const [device, setDevice] = useState(null);
@@ -454,12 +451,6 @@ basic.showIcon(IconNames.Happy)`;
 
     return (
         <>
-            <Navbar
-                isConnected={isConnected}
-                connect={connect}
-                disconnect={disconnect}
-                onShowSidebar={() => setShowSidebar(true)}
-            />
             <div className="app-container">
 
                 {/* Micro:bit Setup Guide */}
@@ -917,7 +908,7 @@ basic.showIcon(IconNames.Happy)`;
                                 </div>
                             </div>
 
-                            <div className="editor-workspace" style={{ height: '600px' }}>
+                            <div className="editor-workspace" style={{ height: '800px' }}>
                                 {showCodePreview && (
                                     <div className="code-preview">
                                         <div className="preview-header">Current Script:</div>
@@ -929,7 +920,7 @@ basic.showIcon(IconNames.Happy)`;
                                         id="makecode-frame"
                                         src="https://makecode.microbit.org/#pub:_RsCVsEF3M0Hg"
                                         allow="usb; bluetooth"
-                                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+                                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-popups-to-escape-sandbox"
                                         style={{ width: '100%', height: '100%', border: 'none' }}
                                     ></iframe>
                                 </div>
@@ -958,7 +949,6 @@ basic.showIcon(IconNames.Happy)`;
                     </aside>
                 )}
             </div>
-            <Footer />
         </>
     );
 }
